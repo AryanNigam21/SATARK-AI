@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>SATARK AI</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;color:#172033}
+header{background:#0d47a1;color:white;padding:24px 8%;font-size:28px;font-weight:700}
+main{max-width:900px;margin:40px auto;padding:0 20px}
+.card{background:white;border-radius:18px;padding:28px;box-shadow:0 5px 20px #0001}
+textarea{width:100%;height:150px;padding:14px;border:1px solid #ccd3df;border-radius:10px;font-size:16px;box-sizing:border-box}
+button{margin-top:16px;background:#0d47a1;color:white;border:0;border-radius:10px;padding:13px 24px;font-size:16px;cursor:pointer}
+.result{margin-top:25px;padding:20px;border-radius:14px;background:#fff3f3;border-left:6px solid #d32f2f}
+.small{color:#596579}.safe{margin-top:15px;background:#f1f8e9;padding:15px;border-radius:10px}
+</style></head>
+<body>
+<header>🛡 SATARK AI — Financial Scam Resilience</header>
+<main><div class="card">
+<h1>Check before you trust.</h1><p class="small">Paste a suspicious financial message, social-media claim or investment offer.</p>
+<textarea id="msg">URGENT! SEBI approved investment. Invest ₹10,000 today and get guaranteed ₹50,000 return. Limited slots. Contact us on WhatsApp now.</textarea>
+<button onclick="analyze()">Analyze Risk</button><div id="out"></div>
+</div></main>
+<script>
+function analyze(){
+ const t=document.getElementById('msg').value.toLowerCase(), flags=[];
+ if(t.includes('guaranteed')||t.includes('guarantee')) flags.push('Guaranteed-return claim');
+ if(t.includes('urgent')||t.includes('limited')) flags.push('Artificial urgency / pressure');
+ if(t.includes('sebi')||t.includes('approved')) flags.push('Regulatory-authority claim should be independently verified');
+ if(t.includes('whatsapp')||t.includes('pay')||t.includes('transfer')) flags.push('Direct contact/payment solicitation');
+ document.getElementById('out').innerHTML=`<div class="result"><h2>🔴 HIGH RISK</h2><b>Red flags detected:</b><ul>${flags.map(x=>'<li>'+x+'</li>').join('')}</ul><div class="safe"><b>Safe next steps</b><br>Don't transfer money or share OTP/PIN. Verify the source independently. SATARK AI does not provide buy/sell advice.</div></div>`;
+}
+analyze();
+</script></body></html>
