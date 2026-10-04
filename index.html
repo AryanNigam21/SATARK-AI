@@ -1,30 +1,193 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>SATARK AI</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="SATARK AI — explainable financial scam resilience prototype">
+<title>SATARK AI — Investor Safety</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;color:#172033}
-header{background:#0d47a1;color:white;padding:24px 8%;font-size:28px;font-weight:700}
-main{max-width:900px;margin:40px auto;padding:0 20px}
-.card{background:white;border-radius:18px;padding:28px;box-shadow:0 5px 20px #0001}
-textarea{width:100%;height:150px;padding:14px;border:1px solid #ccd3df;border-radius:10px;font-size:16px;box-sizing:border-box}
-button{margin-top:16px;background:#0d47a1;color:white;border:0;border-radius:10px;padding:13px 24px;font-size:16px;cursor:pointer}
-.result{margin-top:25px;padding:20px;border-radius:14px;background:#fff3f3;border-left:6px solid #d32f2f}
-.small{color:#596579}.safe{margin-top:15px;background:#f1f8e9;padding:15px;border-radius:10px}
-</style></head>
-<body>
-<header>🛡 SATARK AI — Financial Scam Resilience</header>
-<main><div class="card">
-<h1>Check before you trust.</h1><p class="small">Paste a suspicious financial message, social-media claim or investment offer.</p>
-<textarea id="msg">URGENT! SEBI approved investment. Invest ₹10,000 today and get guaranteed ₹50,000 return. Limited slots. Contact us on WhatsApp now.</textarea>
-<button onclick="analyze()">Analyze Risk</button><div id="out"></div>
-</div></main>
-<script>
-function analyze(){
- const t=document.getElementById('msg').value.toLowerCase(), flags=[];
- if(t.includes('guaranteed')||t.includes('guarantee')) flags.push('Guaranteed-return claim');
- if(t.includes('urgent')||t.includes('limited')) flags.push('Artificial urgency / pressure');
- if(t.includes('sebi')||t.includes('approved')) flags.push('Regulatory-authority claim should be independently verified');
- if(t.includes('whatsapp')||t.includes('pay')||t.includes('transfer')) flags.push('Direct contact/payment solicitation');
- document.getElementById('out').innerHTML=`<div class="result"><h2>🔴 HIGH RISK</h2><b>Red flags detected:</b><ul>${flags.map(x=>'<li>'+x+'</li>').join('')}</ul><div class="safe"><b>Safe next steps</b><br>Don't transfer money or share OTP/PIN. Verify the source independently. SATARK AI does not provide buy/sell advice.</div></div>`;
+:root{
+  --bg:#f4f7fb; --surface:#fff; --surface2:#f8fafc; --text:#172033; --muted:#64748b;
+  --primary:#155eef; --primary2:#0b3ea8; --border:#e2e8f0; --shadow:0 18px 50px rgba(15,35,70,.10);
+  --danger:#dc3545; --warning:#d97706; --success:#16a34a; --info:#2563eb;
 }
-analyze();
-</script></body></html>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);transition:.25s}
+button,select,textarea,input{font:inherit}
+button{cursor:pointer}
+header{
+ position:sticky;top:0;z-index:50;background:rgba(255,255,255,.88);backdrop-filter:blur(16px);
+ border-bottom:1px solid var(--border)
+}
+.nav{max-width:1200px;margin:auto;padding:13px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit}
+.logo{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#0b3ea8,#4385ff);font-size:23px;box-shadow:0 8px 18px #155eef33}
+.brand strong{font-size:21px}.brand small{display:block;color:var(--muted);font-size:10px;margin-top:2px;letter-spacing:.3px}
+.navActions{display:flex;align-items:center;gap:8px}
+.iconBtn,.langBtn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:10px;padding:9px 11px}
+.langBtn{display:flex;align-items:center;gap:6px}
+main{max-width:1200px;margin:auto;padding:28px 20px 45px}
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:20px;margin-bottom:20px}
+.heroCard,.panel{background:var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow)}
+.heroCard{padding:34px}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;background:#eaf1ff;color:var(--primary);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:800}
+.hero h1{font-size:clamp(36px,5vw,60px);line-height:1.02;margin:17px 0 12px;letter-spacing:-2px}
+.hero p{color:var(--muted);font-size:17px;line-height:1.65;max-width:700px}
+.heroStats{display:flex;gap:25px;flex-wrap:wrap;margin-top:25px}.heroStats b{font-size:21px}.heroStats span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.guard{padding:25px}.guard h2{margin:0 0 14px;font-size:19px}.guardItem{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px}.guardItem:last-child{border:0}.tick{color:var(--success);font-weight:900}
+.layout{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}
+.panel{padding:24px}.panelHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.panelHead h2{margin:0;font-size:20px}
+select{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:9px 11px;border-radius:10px;outline:none}
+textarea{width:100%;min-height:210px;resize:vertical;padding:16px;border:1px solid var(--border);border-radius:15px;background:var(--surface2);color:var(--text);outline:none;line-height:1.55}
+textarea:focus{border-color:#5b8def;box-shadow:0 0 0 4px #155eef15}
+.toolbar{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:10px}.counter{font-size:11px;color:var(--muted)}
+.samples{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}.sample{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:9px;padding:7px 10px;font-size:11px}
+.primary{width:100%;border:0;color:#fff;background:linear-gradient(135deg,#0d47a1,#357bff);padding:14px;border-radius:12px;font-weight:800;font-size:15px;box-shadow:0 10px 22px #155eef2b}
+.secondary{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:10px 12px;border-radius:10px}
+.actionRow{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:9px}
+.scan{display:none;text-align:center;padding:27px 10px}.spinner{width:42px;height:42px;border:4px solid #dbe7ff;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 10px}@keyframes spin{to{transform:rotate(360deg)}}
+.result{display:none;margin-top:18px;border:1px solid var(--border);border-radius:17px;padding:17px}
+.risk{display:flex;align-items:center;gap:15px}.meter{width:86px;height:86px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--danger) 0 75%,#e9eef5 75%);position:relative}.meter:after{content:"";position:absolute;width:66px;height:66px;background:var(--surface);border-radius:50%}.score{position:relative;z-index:1;font-weight:900}
+.riskName{font-size:24px;font-weight:900}.riskSub{font-size:12px;color:var(--muted);margin-top:3px}
+.flags{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}.flag{padding:11px;border-radius:11px;background:#fff5f5;border:1px solid #ffd5d9;font-size:12px}.flag b{display:block;margin-bottom:3px}
+.safe{margin-top:12px;padding:13px;border-radius:12px;background:#effaf1;border:1px solid #c9efcf;font-size:12px}.safe b{color:#16823a}
+.resultActions{display:flex;gap:7px;margin-top:10px}.resultActions button{flex:1}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:9px}.check{padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface2)}.check b{display:block;font-size:13px;margin-bottom:4px}.check span{font-size:11px;color:var(--muted)}
+.history{margin-top:22px}.history h3{font-size:15px;margin:0 0 8px}.hist{padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:10px;font-size:11px}.high{color:var(--danger);font-weight:800}.med{color:var(--warning);font-weight:800}.low{color:var(--success);font-weight:800}
+.disclaimer{margin-top:20px;text-align:center;color:var(--muted);font-size:11px;line-height:1.5}
+.toast{position:fixed;right:20px;bottom:20px;background:#172033;color:#fff;padding:12px 15px;border-radius:11px;display:none;z-index:100;box-shadow:var(--shadow)}
+.modal{display:none;position:fixed;inset:0;background:#0007;z-index:90;align-items:center;justify-content:center;padding:20px}.modalBox{max-width:620px;width:100%;background:var(--surface);border-radius:18px;padding:24px;box-shadow:0 25px 70px #0004}.modalBox h2{margin-top:0}.modalBox p{color:var(--muted);line-height:1.6}.close{float:right;border:0;background:transparent;color:var(--muted);font-size:22px}
+body.dark{--bg:#09111f;--surface:#111c2d;--surface2:#0d1727;--text:#eef4ff;--muted:#9eacc1;--border:#24344d;--shadow:0 18px 55px #0006}
+body.dark header{background:#0d1727e8}
+body.dark .eyebrow{background:#102b61}
+body.dark .flag{background:#321a20;border-color:#5b2932}.dark .safe{background:#11281a}
+@media(max-width:850px){.hero,.layout{grid-template-columns:1fr}.actionRow{grid-template-columns:1fr 1fr}.flags,.checks{grid-template-columns:1fr}.hero h1{letter-spacing:-1px}}
+</style>
+</head>
+<body>
+<header>
+ <nav class="nav">
+  <a class="brand" href="#"><div class="logo">🛡</div><div><strong>SATARK AI</strong><small>INVESTOR SAFETY INTELLIGENCE</small></div></a>
+  <div class="navActions">
+   <select id="language" onchange="changeLanguage()"><option value="en">🇬🇧 English</option><option value="hi">🇮🇳 हिन्दी</option></select>
+   <button class="iconBtn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+   <button class="iconBtn" onclick="openAbout()">ⓘ</button>
+  </div>
+ </nav>
+</header>
+
+<main>
+<section class="hero">
+ <div class="heroCard hero">
+  <div>
+   <span class="eyebrow">● <span data-i18n="eyebrow">Bharat-first investor protection</span></span>
+   <h1 data-i18n="heroTitle">Check before<br>you trust.</h1>
+   <p data-i18n="heroDesc">Analyze suspicious financial messages, social-media claims and investment offers for scam indicators before you act.</p>
+   <div class="heroStats"><div><b>Explainable</b><span>Clear red flags</span></div><div><b>Privacy-first</b><span>No credentials</span></div><div><b>Hindi + EN</b><span>Simple language</span></div></div>
+  </div>
+ </div>
+ <div class="panel guard">
+  <h2 data-i18n="safetyTitle">🛡 Safety by design</h2>
+  <div class="guardItem"><span class="tick">✓</span><span data-i18n="safe1">No buy/sell recommendations</span></div>
+  <div class="guardItem"><span class="tick">✓</span><span data-i18n="safe2">No stock predictions or trading signals</span></div>
+  <div class="guardItem"><span class="tick">✓</span><span data-i18n="safe3">No OTP, PIN or bank credentials</span></div>
+  <div class="guardItem"><span class="tick">✓</span><span data-i18n="safe4">Explains why content looks risky</span></div>
+ </div>
+</section>
+
+<section class="layout">
+ <div class="panel">
+  <div class="panelHead"><h2 data-i18n="analyzeTitle">🔎 Analyze suspicious content</h2><span class="eyebrow">Prototype</span></div>
+  <textarea id="message" maxlength="5000" oninput="updateCounter()" aria-label="Suspicious message">URGENT! SEBI approved investment. Invest ₹10,000 today and get guaranteed ₹50,000 return. Limited slots. Contact us on WhatsApp now.</textarea>
+  <div class="toolbar"><span class="counter" id="counter">0 / 5000</span><button class="secondary" onclick="clearInput()" data-i18n="clear">Clear</button></div>
+  <div class="samples">
+   <button class="sample" onclick="loadSample(0)" data-i18n="sample1">Guaranteed returns</button>
+   <button class="sample" onclick="loadSample(1)" data-i18n="sample2">Fake KYC</button>
+   <button class="sample" onclick="loadSample(2)" data-i18n="sample3">Normal message</button>
+  </div>
+  <div class="actionRow"><button class="primary" onclick="analyze()" id="analyzeBtn">⚡ <span data-i18n="analyze">Analyze Risk</span></button><button class="secondary" onclick="pasteText()">Paste</button><button class="secondary" onclick="loadSample(0)">Demo</button></div>
+  <div class="scan" id="scan"><div class="spinner"></div><b data-i18n="scanning">Scanning for risk signals…</b><div class="riskSub">NLP-style indicators • urgency • claims • payment cues</div></div>
+  <div class="result" id="result">
+   <div class="risk"><div class="meter" id="meter"><span class="score" id="score">0%</span></div><div><div class="riskName" id="riskName">HIGH RISK</div><div class="riskSub" id="riskSub">Multiple safety signals detected</div></div></div>
+   <div class="flags" id="flags"></div>
+   <div class="safe"><b data-i18n="safeNext">✓ Safe next steps</b><br><span id="safeText">Do not transfer money or share OTP/PIN. Verify the sender independently.</span></div>
+   <div class="resultActions"><button class="secondary" onclick="copyResult()">📋 Copy report</button><button class="secondary" onclick="speakResult()">🔊 Read aloud</button></div>
+  </div>
+ </div>
+
+ <div class="panel">
+  <div class="panelHead"><h2 data-i18n="checksTitle">📊 What SATARK checks</h2></div>
+  <div class="checks">
+   <div class="check"><b>🚨 Urgency</b><span>“Act now”, “limited”, expiry pressure</span></div>
+   <div class="check"><b>💰 Returns</b><span>Guaranteed or unrealistic profits</span></div>
+   <div class="check"><b>🏛 Authority</b><span>Regulator/official claims to verify</span></div>
+   <div class="check"><b>💳 Payments</b><span>UPI, transfer, OTP or PIN requests</span></div>
+   <div class="check"><b>🎭 Impersonation</b><span>Trusted-brand or institution cues</span></div>
+   <div class="check"><b>🔗 Links</b><span>Suspicious URLs and action cues</span></div>
+  </div>
+  <div class="history"><h3 data-i18n="history">Recent scans</h3><div id="history"></div></div>
+ </div>
+</section>
+<div class="disclaimer" data-i18n="disclaimer">SATARK AI is an investor-awareness prototype. It does not provide financial advice, investment recommendations or trading signals. Verify important information through official sources.</div>
+</main>
+
+<div class="toast" id="toast"></div>
+<div class="modal" id="about"><div class="modalBox"><button class="close" onclick="closeAbout()">×</button><h2>About SATARK AI</h2><p>SATARK AI is a functional front-end prototype for investor scam resilience. It combines transparent safety rules with an explainable risk presentation. A production implementation can connect multilingual NLP/LLM analysis, verified public sources, URL reputation services and voice support.</p><p><b>Prototype safety:</b> Never enter passwords, OTPs, PINs, bank credentials or other sensitive information.</p></div></div>
+
+<script>
+const I18N={
+en:{eyebrow:"Bharat-first investor protection",heroTitle:"Check before<br>you trust.",heroDesc:"Analyze suspicious financial messages, social-media claims and investment offers for scam indicators before you act.",safetyTitle:"🛡 Safety by design",safe1:"No buy/sell recommendations",safe2:"No stock predictions or trading signals",safe3:"No OTP, PIN or bank credentials",safe4:"Explains why content looks risky",analyzeTitle:"🔎 Analyze suspicious content",clear:"Clear",sample1:"Guaranteed returns",sample2:"Fake KYC",sample3:"Normal message",analyze:"Analyze Risk",scanning:"Scanning for risk signals…",safeNext:"✓ Safe next steps",checksTitle:"📊 What SATARK checks",history:"Recent scans",disclaimer:"SATARK AI is an investor-awareness prototype. It does not provide financial advice, investment recommendations or trading signals. Verify important information through official sources."},
+hi:{eyebrow:"भारत-केंद्रित निवेशक सुरक्षा",heroTitle:"भरोसा करने से<br>पहले जाँचें।",heroDesc:"संदिग्ध वित्तीय संदेशों, सोशल मीडिया दावों और निवेश ऑफ़र में धोखाधड़ी के संकेतों की जाँच करें।",safetyTitle:"🛡 सुरक्षा पहले",safe1:"खरीद/बिक्री की सलाह नहीं",safe2:"स्टॉक भविष्यवाणी या ट्रेडिंग सिग्नल नहीं",safe3:"OTP, PIN या बैंक जानकारी नहीं",safe4:"बताता है कि सामग्री जोखिमपूर्ण क्यों है",analyzeTitle:"🔎 संदिग्ध सामग्री की जाँच",clear:"साफ करें",sample1:"गारंटीड रिटर्न",sample2:"फर्जी KYC",sample3:"सामान्य संदेश",analyze:"जोखिम जाँचें",scanning:"जोखिम संकेतों की जाँच हो रही है…",safeNext:"✓ सुरक्षित अगले कदम",checksTitle:"📊 SATARK क्या जाँचता है",history:"हाल की जाँच",disclaimer:"SATARK AI निवेश जागरूकता का प्रोटोटाइप है। यह वित्तीय सलाह, निवेश सुझाव या ट्रेडिंग सिग्नल नहीं देता। महत्वपूर्ण जानकारी आधिकारिक स्रोतों से सत्यापित करें।"}};
+const samples=[
+"URGENT! SEBI approved investment. Invest ₹10,000 today and get guaranteed ₹50,000 return. Limited slots. Contact us on WhatsApp now.",
+"Your bank KYC will expire today. Click this link and share your OTP immediately to avoid account suspension.",
+"Your mutual fund statement is available in your official banking app. Please review it when convenient."
+];
+function flagsFor(t){
+ const f=[];
+ if(/guaranteed|guarantee|double your|100% profit|fixed return|sure profit|गारंटीड|गारंटी/.test(t))f.push(["Guaranteed-return claim","Promises or implies guaranteed profit."]);
+ if(/urgent|limited|act now|today|immediately|expire|तुरंत|आज|सीमित/.test(t))f.push(["Artificial urgency","Pressure language can reduce careful decision-making."]);
+ if(/sebi|rbi|government|approved|official|सरकार|अनुमोदित/.test(t))f.push(["Authority claim","Regulatory or official claims should be independently verified."]);
+ if(/whatsapp|telegram|pay|payment|transfer|upi|otp|pin|password|ओटीपी|पिन|भुगतान/.test(t))f.push(["Sensitive/payment solicitation","Requests contact, payment or sensitive credentials."]);
+ if(/click|bit\.ly|tinyurl|http:\/\//.test(t))f.push(["Link/action cue","Links or urgent actions should be verified before opening."]);
+ if(/crypto|forex|binary|casino/.test(t))f.push(["High-risk promotion cue","High-risk financial promotions require extra verification."]);
+ return f;
+}
+function analyze(){
+ const text=document.getElementById("message").value.trim();
+ if(!text){toast("Please paste a message first.");return}
+ const btn=document.getElementById("analyzeBtn"),scan=document.getElementById("scan"),res=document.getElementById("result");
+ btn.disabled=true;scan.style.display="block";res.style.display="none";
+ setTimeout(()=>{
+  const f=flagsFor(text.toLowerCase()),score=Math.min(98,Math.max(7,f.length*15+(text.length>100?8:0)));
+  const high=score>=55,med=score>=30,color=high?"#dc3545":med?"#d97706":"#16a34a";
+  document.getElementById("score").textContent=score+"%";
+  document.getElementById("meter").style.background=`conic-gradient(${color} 0 ${score}%,#e9eef5 ${score}% 100%)`;
+  const name=high?"HIGH RISK":med?"SUSPICIOUS":"LOW RISK";
+  document.getElementById("riskName").textContent=name;
+  document.getElementById("riskName").style.color=color;
+  document.getElementById("riskSub").textContent=f.length?`${f.length} safety signal${f.length>1?"s":""} detected`:"No major scam indicators detected";
+  document.getElementById("flags").innerHTML=f.length?f.map(x=>`<div class="flag"><b>⚠ ${x[0]}</b>${x[1]}</div>`).join(""):`<div class="flag" style="background:#effaf1;border-color:#c9efcf"><b>✓ No major indicators</b>Still verify important financial claims independently.</div>`;
+  document.getElementById("safeText").textContent=high?"Do not transfer money or share OTP/PIN. Stop and verify the sender through an official channel.":med?"Pause before acting. Verify the sender, URL and financial claim through an official source.":"No major indicators were detected, but always verify financial information independently.";
+  saveHistory(name,score,text);scan.style.display="none";res.style.display="block";btn.disabled=false;
+ },850);
+}
+function loadSample(i){document.getElementById("message").value=samples[i];updateCounter();analyze()}
+function clearInput(){document.getElementById("message").value="";updateCounter();document.getElementById("result").style.display="none"}
+async function pasteText(){try{document.getElementById("message").value=await navigator.clipboard.readText();updateCounter();toast("Pasted from clipboard");}catch(e){toast("Clipboard permission not available — paste with Ctrl+V.")}}
+function updateCounter(){document.getElementById("counter").textContent=document.getElementById("message").value.length+" / 5000"}
+function saveHistory(level,score,text){let h=JSON.parse(localStorage.getItem("satarkHistory")||"[]");h.unshift({level,score,text:text.slice(0,52)});localStorage.setItem("satarkHistory",JSON.stringify(h.slice(0,6)));renderHistory()}
+function renderHistory(){let h=JSON.parse(localStorage.getItem("satarkHistory")||"[]");document.getElementById("history").innerHTML=h.length?h.map(x=>`<div class="hist"><span>${x.text}${x.text.length>=52?"…":""}</span><span class="${x.level==="HIGH RISK"?"high":x.level==="SUSPICIOUS"?"med":"low"}">${x.level} · ${x.score}%</span></div>`).join(""):"<span class='riskSub'>No scans yet.</span>"}
+function copyResult(){const r=document.getElementById("riskName").textContent+" — "+document.getElementById("riskSub").textContent+"\n\n"+document.getElementById("flags").innerText+"\n\n"+document.getElementById("safeText").textContent;navigator.clipboard?.writeText(r);toast("Report copied")}
+function speakResult(){const r=document.getElementById("riskName").textContent+". "+document.getElementById("riskSub").textContent+". "+document.getElementById("safeText").textContent;if("speechSynthesis"in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(r))}else toast("Text-to-speech is not supported in this browser")}
+function toggleTheme(){document.body.classList.toggle("dark");localStorage.setItem("satarkTheme",document.body.classList.contains("dark")?"dark":"light");document.getElementById("themeBtn").textContent=document.body.classList.contains("dark")?"☀️":"🌙"}
+function changeLanguage(){const lang=document.getElementById("language").value;document.querySelectorAll("[data-i18n]").forEach(el=>el.innerHTML=I18N[lang][el.dataset.i18n]);toast(lang==="hi"?"भाषा हिन्दी में बदली गई":"Language changed to English")}
+function toast(t){const x=document.getElementById("toast");x.textContent=t;x.style.display="block";clearTimeout(window.tt);window.tt=setTimeout(()=>x.style.display="none",1900)}
+function openAbout(){document.getElementById("about").style.display="flex"}function closeAbout(){document.getElementById("about").style.display="none"}
+document.getElementById("message").addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter")analyze()});
+if(localStorage.getItem("satarkTheme")==="dark"){document.body.classList.add("dark");document.getElementById("themeBtn").textContent="☀️"}
+updateCounter();renderHistory();setTimeout(analyze,250);
+</script>
+</body>
+</html>
